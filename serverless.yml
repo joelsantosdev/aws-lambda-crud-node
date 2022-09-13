@@ -1,0 +1,65 @@
+service: aws-lambda-crud-node
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-west-2
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource:
+        - arn:aws:dynamodb:us-east-2:123456789012:table/YOURDynamoDBTable 
+  
+
+functions:
+  createMovie:
+    handler: src/createMovie.createMovie
+    events:
+      - httpApi:
+          path: /peliculas
+          method: post
+
+  updateMovie:
+    handler: src/updateMovie.updateMovie
+    events:
+      - httpApi:
+          path: /peliculas/{id}
+          method: put
+
+  deleteMovie:
+    handler: src/deleteMovie.deleteMovie
+    events:
+      - httpApi:
+          path: /peliculas/{id}
+          method: delete
+
+  getMovies:
+    handler: src/getMovies.getMovies
+    events:
+      - httpApi:
+          path: /peliculas
+          method: get
+
+  getMovie:
+    handler: src/getMovie.getMovie
+    events:
+      - httpApi:
+          path: /peliculas/{id}
+          method: get
+
+ 
+resources:
+  Resources:
+    PeliculasTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: PeliculasTable
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        BillingMode: PAY_PER_REQUEST
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
